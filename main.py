@@ -72,17 +72,19 @@ class MainWindow(QWidget):
         super().__init__()
         self.initUI()
         self.cfg_manager = ConfigManager()
-        self.logger = SingletonLogger()
+        self.logger = SingletonLogger().get_logger()
         self.decryptScriptObj = DecryptScript()
         self.extractScriptObj = ExtractScript()
         extract_script_folder = self.cfg_manager.get("output_folder_extract", "./data/3-merge")
         if os.path.exists(os.path.join(extract_script_folder, 'cfgSound.csv')) \
                 and os.path.exists(os.path.join(extract_script_folder, 'cfgSound1.csv')):
             self.cfgSound_mergeScriptObj = MergeScript(
-                pd.read_csv(os.path.join(extract_script_folder, 'cfgSound.csv'), dtype='str')
+                pd.read_csv(os.path.join(extract_script_folder, 'cfgSound.csv'), dtype='str'),
+                script_name='cfgSound'
             )
             self.cfgSound1_mergeScriptObj = MergeScript(
-                pd.read_csv(os.path.join(extract_script_folder, 'cfgSound1.csv'), dtype='str')
+                pd.read_csv(os.path.join(extract_script_folder, 'cfgSound1.csv'), dtype='str'),
+                script_name='cfgSound1'
             )
         else:
             self.cfgSound_mergeScriptObj = None
@@ -241,28 +243,60 @@ class MainWindow(QWidget):
     def extract(self):
         self.run_task(1, self.extractScriptObj.run_extraction)
 
-
     def detach(self):
         model = self.model_input.text()
         key = self.key_input.text()
-        if not model or not key:
+        if not model and not key:
             QMessageBox.warning(self, "Input Error", "Please enter both model and key.")
             return
-        self.run_task(2, MergeScript(None).mergeScript)
+        if self.cfgSound_mergeScriptObj is None or self.cfgSound_mergeScriptObj is None:
+            extract_script_folder = self.cfg_manager.get("output_folder_extract", "./data/3-merge")
+            if os.path.exists(os.path.join(extract_script_folder, 'cfgSound.csv')) \
+                    and os.path.exists(os.path.join(extract_script_folder, 'cfgSound1.csv')):
+                self.cfgSound_mergeScriptObj = MergeScript(
+                    pd.read_csv(os.path.join(extract_script_folder, 'cfgSound.csv'), dtype='str'),
+                    script_name='cfgSound'
+                )
+                self.cfgSound1_mergeScriptObj = MergeScript(
+                    pd.read_csv(os.path.join(extract_script_folder, 'cfgSound1.csv'), dtype='str'),
+                    script_name='cfgSound1'
+                )
+            else:
+                self.logger.warning("merge resource not found")
+                raise FileNotFoundError("merge resource not found")
+        self.run_task(2, self.detach1)
+
+    async def detach1(self):
+        self.cfgSound_mergeScriptObj.detachScript(key=self.key_input.text(), model=self.model_input.text())
+        self.cfgSound1_mergeScriptObj.detachScript(key=self.key_input.text(), model=self.model_input.text())
 
     def merge(self):
-        model = self.model_input.text()
-        key = self.key_input.text()
-        if not model or not key:
-            QMessageBox.warning(self, "Input Error", "Please enter both model and key.")
-            return
-        self.run_task(2, MergeScript(None).mergeScript)
+        if self.cfgSound_mergeScriptObj is None or self.cfgSound_mergeScriptObj is None:
+            extract_script_folder = self.cfg_manager.get("output_folder_extract", "./data/3-merge")
+            if os.path.exists(os.path.join(extract_script_folder, 'cfgSound.csv')) \
+                    and os.path.exists(os.path.join(extract_script_folder, 'cfgSound1.csv')):
+                self.cfgSound_mergeScriptObj = MergeScript(
+                    pd.read_csv(os.path.join(extract_script_folder, 'cfgSound.csv'), dtype='str'),
+                    script_name='cfgSound'
+                )
+                self.cfgSound1_mergeScriptObj = MergeScript(
+                    pd.read_csv(os.path.join(extract_script_folder, 'cfgSound1.csv'), dtype='str'),
+                    script_name='cfgSound1'
+                )
+            else:
+                self.logger.warning("merge resource not found")
+                raise FileNotFoundError("merge resource not found")
+        self.run_task(3, self.merge1)
+
+    async def merge1(self):
+        self.cfgSound_mergeScriptObj.mergeScript()
+        self.cfgSound1_mergeScriptObj.mergeScript()
 
     def pack(self):
-        self.run_task(3, self.extractScriptObj.run_packaging)
+        self.run_task(4, self.extractScriptObj.run_packaging)
 
     def encrypt(self):
-        self.run_task(4, self.decryptScriptObj.encrypt)
+        self.run_task(5, self.decryptScriptObj.encrypt)
 
 
 if __name__ == '__main__':

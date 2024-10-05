@@ -136,7 +136,7 @@ class ExtractScript:
                     print(f"Packing Lua file: {text_asset.m_Name}")
 
                     # 获取合并后的 CSV 文件路径
-                    csv_path = self.cfg_manager.get("output_file_merge", "./data/3-merge")
+                    csv_path = self.cfg_manager.get("output_folder_merge", "./data/3-merge/modified")
                     csv_filename = os.path.join(csv_path, f"{text_asset.m_Name.split('.')[0]}.csv")
                     print(csv_filename)
                     # 打包 Lua 文件格式

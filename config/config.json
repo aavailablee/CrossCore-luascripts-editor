@@ -56,5 +56,8 @@
     "input_file_extract": "./data/2-origin/luascripts-decrypted",
     "output_folder_extract": "./data/3-merge",
     "output_file_merge": "./data/3-merge",
-    "output_folder_pack": "./data/4-pack"
+    "output_folder_pack": "./data/4-pack",
+    "output_folder_detach_folder": "./data/3-merge/detach",
+    "input_folder_merge": "./data/3-merge/detach",
+    "output_folder_merge": "./data/3-merge/modified"
 }

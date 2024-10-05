@@ -3,30 +3,32 @@ import time
 
 import pandas
 import pandas as pd
+from pandas import DataFrame
 
 from config.configManager import ConfigManager
 from config.log import SingletonLogger
 
 
 class MergeScript:
-    def __init__(self, dataFrame):
+    def __init__(self, dataFrame: DataFrame,
+                 script_name: str):
         self.dataFrame = dataFrame
         self.cfg_manager = ConfigManager()
         self.logger = SingletonLogger().get_logger()
+        self.script_name = script_name
 
     def mergeScript(self):
-        mergedPath = ConfigManager.getPath("merge_folder")
-        fileList = os.listdir(mergedPath)
+        input_folder_merge = self.cfg_manager.get("input_folder_merge", './data/3-merge/detach')
+        fileList = os.listdir(input_folder_merge)
         for index, file in enumerate(fileList):
-            if file.endswith(".csv") and not file.startswith("merged_"):
-                print(f"{index}: {file}")
-                with open(f'{mergedPath}/{file}', 'r', encoding='utf') as csvFile:
-                    try:
-                        singleFile = pandas.read_csv(csvFile)
-                        self.mergeScriptSingle(singleFile)
-                    except pandas.errors.EmptyDataError as e:
-                        print(f"{e}: {file}")
-        self.saveScript()
+            filePath = os.path.join(input_folder_merge, file)
+            if file.endswith(".csv"):
+                print(f"{index}: {filePath}")
+                tmp_df = pd.read_csv(filePath, dtype='str')
+                self.mergeScriptSingle(tmp_df)
+        output_folder_merge = self.cfg_manager.get('output_folder_merge', './data/3-merge/modified')
+        filename = os.path.join(output_folder_merge, f"{self.script_name}.csv")
+        self.dataFrame.to_csv(filename, index=False)
 
     def mergeScriptSingle(self, singleFile):
         # 假设 'key' 是连接列，并且 'script1' 是要替换的列
@@ -55,11 +57,15 @@ class MergeScript:
             raise Exception("detachScript requires model or key parameter")
         elif model:
             detach_df = self.dataFrame[self.dataFrame['model'].astype(str).str[:4] == model]
+            self.logger.debug(f"Detaching by model: {model}")
         elif key:
             detach_df = self.dataFrame[self.dataFrame['key'].str.split('_').str[0] == key]
+            self.logger.debug(f"Detaching by key: {key}")
         output_folder_detach_df = self.cfg_manager.get('output_folder_detach_folder', './data/3-merge/detach')
-        filename = os.path.join(output_folder_detach_df, key+'.csv')
-        if detach_df:
+        name = model if model is not None else key
+        filename = os.path.join(output_folder_detach_df, f"{name}.csv")
+        if not detach_df.empty:
+            self.logger.debug(f"Detaching {filename}")
             detach_df.to_csv(filename, index=False)
         else:
             self.logger.warning("404 File Not Found")
