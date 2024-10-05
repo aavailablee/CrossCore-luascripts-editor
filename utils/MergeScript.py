@@ -5,11 +5,14 @@ import pandas
 import pandas as pd
 
 from config.configManager import ConfigManager
+from config.log import SingletonLogger
 
 
 class MergeScript:
     def __init__(self, dataFrame):
         self.dataFrame = dataFrame
+        self.cfg_manager = ConfigManager()
+        self.logger = SingletonLogger().get_logger()
 
     def mergeScript(self):
         mergedPath = ConfigManager.getPath("merge_folder")
@@ -43,6 +46,25 @@ class MergeScript:
         # 更新 self.dataFrame
         self.dataFrame = updated_df
 
+    def detachScript(self,
+                     model: str = '',
+                     key: str = ''):
+        detach_df = None
+        if model is None and key is None:
+            self.logger.error("Please provide either model(3048) or key(Ushuaia)")
+            raise Exception("detachScript requires model or key parameter")
+        elif model:
+            detach_df = self.dataFrame[self.dataFrame['model'].astype(str).str[:4] == model]
+        elif key:
+            detach_df = self.dataFrame[self.dataFrame['key'].str.split('_').str[0] == key]
+        output_folder_detach_df = self.cfg_manager.get('output_folder_detach_folder', './data/3-merge/detach')
+        filename = os.path.join(output_folder_detach_df, key+'.csv')
+        if detach_df:
+            detach_df.to_csv(filename, index=False)
+        else:
+            self.logger.warning("404 File Not Found")
+
+
     def saveScript(self):
         mergePath = ConfigManager.getPath("merge_folder")
         nameString: str = "merged_" + time.strftime("%y%m%d_%H%M%S") + ".csv"
@@ -56,12 +78,8 @@ class MergeScript:
 
 if __name__ == '__main__':
 
-    dataName = ConfigManager.getPath("data_folder")
-    print(dataName)
-    exit(1)
-    dataName = os.path.join(dataName, ConfigManager.config['soundTextName'] + '.csv')
-    print(dataName)
-    dataFrame = pandas.read_csv(dataName)
-    print(dataFrame)
-    mergeScript = MergeScript(dataFrame)
-    mergeScript.savetoPacket()
+
+    dataframe = pd.read_csv('../data/3-merge/cfgSound1.csv', dtype='str')
+    mergeScript = MergeScript(dataframe)
+    df = mergeScript.detachScript(model='3048', key='Ushuaia')
+    print(df)
