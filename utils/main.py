@@ -31,7 +31,13 @@ def utils_main(args=None):
     if options.encrypt:
         platform = options.platform.lower()
         if platform == 'android':
-            LuaScripts.GenEncryptABData(options.infile, options.outfile, True, not options.nofix)
+            result = LuaScripts.GenEncryptABData(options.infile, options.outfile, True, not options.nofix)
+            if isinstance(result, bool):
+                # 如果 result 是布尔值，表示成功与否
+                return result
+            else:
+                # 如果 result 不是布尔值，按你需要的逻辑处理，这里假设成功
+                return True
         elif platform == 'ios':
             LuaScripts.GenEncryptABData(options.infile, options.outfile, False, not options.nofix)
         else:

@@ -16,6 +16,7 @@ from utils.MergeScript import MergeScript
 import asyncio
 
 
+
 class WorkerThread(QThread):
     progress = pyqtSignal(int)
     finished = pyqtSignal(bool, str)
@@ -29,7 +30,13 @@ class WorkerThread(QThread):
     def run(self):
         try:
             result = asyncio.run(self.function(*self.args, **self.kwargs))
-            self.finished.emit(True, "")
+            if isinstance(result, bool):
+                # 如果 result 是布尔值，表示成功与否
+                self.finished.emit(result, "")
+            else:
+                # 如果 result 不是布尔值，按你需要的逻辑处理，这里假设成功
+                self.finished.emit(True, "")
+            # self.finished.emit(True, "")
         except Exception as e:
             error_msg = f"Error: {str(e)}\n{traceback.format_exc()}"
             print(error_msg)
@@ -72,7 +79,33 @@ class MainWindow(QWidget):
         super().__init__()
         self.initUI()
         self.cfg_manager = ConfigManager()
+
         self.logger = SingletonLogger().get_logger()
+        if not os.path.exists('./data'):
+            os.mkdir('./data')
+            self.logger.info('Creating data directory')
+        if not os.path.exists('./data/1-resource'):
+            os.mkdir('./data/1-resource')
+            self.logger.info('Creating 1-resource directory')
+        if not os.path.exists('./data/2-origin'):
+            os.mkdir('./data/2-origin')
+            self.logger.info('Creating 2-origin directory')
+        if not os.path.exists('./data/3-merge'):
+            os.mkdir('./data/3-merge')
+            self.logger.info('Creating 3-merge directory')
+        if not os.path.exists('./data/3-merge/detach'):
+            os.mkdir('./data/3-merge/detach')
+            self.logger.info('Creating 3-merge/detach directory')
+        if not os.path.exists('./data/3-merge/modified'):
+            os.mkdir('./data/3-merge/modified')
+            self.logger.info('Creating 3-merge/modified directory')
+        if not os.path.exists('./data/4-pack'):
+            os.mkdir('./data/4-pack')
+            self.logger.info('Creating 4-pack directory')
+        if not os.path.exists('./data/5-output'):
+            os.mkdir('./data/5-output')
+            self.logger.info('Creating 5-output directory')
+        self.logger.info('all directories exist')
         self.decryptScriptObj = DecryptScript()
         self.extractScriptObj = ExtractScript()
         extract_script_folder = self.cfg_manager.get("output_folder_extract", "./data/3-merge")
@@ -230,7 +263,7 @@ class MainWindow(QWidget):
         self.worker.start()
 
     def onFinished(self, index, success, error_msg):
-        self.progress_bar.setValue(100)
+        print(success, error_msg)
         status = "Completed" if success else "Failed"
         self.status_labels[index].setStatus(status)
         if not success:
@@ -238,6 +271,11 @@ class MainWindow(QWidget):
         print(f"Operation {status}")
 
     def decrypt(self):
+        path = self.cfg_manager.get('input_file_decrypt', "./data/1-resource/luascripts")
+        if not os.path.exists(path):
+            QMessageBox.critical(self, "Error", "需要源文件luascripts放到1-resource中，即./data/1-resource/luascripts")
+            self.status_labels[0].setStatus("Failed")
+            return
         self.run_task(0, self.decryptScriptObj.decrypt)
 
     def extract(self):

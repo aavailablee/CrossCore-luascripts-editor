@@ -9,6 +9,9 @@ config_path = Path(os.path.join(current_dir, "config.json"))
 
 def loadConfig():
     """读取配置"""
+    if not config_path.exists():
+        with open(config_path, "w", encoding="utf-8") as tmp:
+            json.dump({}, tmp)
     with open(config_path, "r", encoding="utf-8") as json_file:
         config = json.load(json_file)
     return config

@@ -35,7 +35,7 @@ class LuaScripts:
 
             except requests.RequestException as e:
                 print(f"Error: {str(e)}")
-                return
+                return False
 
                 # 直接对 rawBytes 进行加密操作
             rawBytes = rawBytes + bytes([0x0b])  # most important
@@ -57,7 +57,7 @@ class LuaScripts:
 
             except requests.RequestException as e:
                 print(f"Error: {str(e)}")
-                return
+                return False
 
             # 只保存 finalBytes
             with open(outfile, 'wb') as f:
@@ -73,3 +73,4 @@ class LuaScripts:
         # print(bytesData[0])
         with open(outfile, 'wb') as f:
             f.write(bytesData)
+        return True

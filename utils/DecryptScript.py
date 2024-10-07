@@ -48,23 +48,39 @@ class DecryptScript:
             pass
 
     async def encrypt(self):
-        if self.game == 'JCZX':
-            #  todo
-            if (None is self.input_file_encrypt) or (None is self.output_file_encrypt):
-                raise Exception(f'加密流程，参数不足，'
-                                f'inputFileEncrypt:{self.input_file_encrypt}, '
-                                f'outputFileEncrypt:{self.output_file_encrypt}')
-            # 显式传递参数列表
-            args = ['-i', self.input_file_encrypt,
+        try:
+            # 判断游戏类型
+            if self.game == 'JCZX':
+                # 检查输入和输出文件是否提供
+                if not self.input_file_encrypt or not self.output_file_encrypt:
+                    raise Exception(f'加密流程，参数不足，'
+                                    f'inputFileEncrypt: {self.input_file_encrypt}, '
+                                    f'outputFileEncrypt: {self.output_file_encrypt}')
+
+                # 设置参数列表，显式传递参数
+                args = [
+                    '-i', self.input_file_encrypt,
                     '-o', self.output_file_encrypt,
                     '--encrypt',
-                    '--platform', 'android' if self.isAndroid else 'ios']
-            utils_main(args)
-            pass
-        else:
-            # throw
-            raise Exception(f"未指定游戏")
-            pass
+                    '--platform', 'android' if self.isAndroid else 'ios'
+                ]
+
+                # 调用加密函数
+                result = utils_main(args)
+                if isinstance(result, bool):
+                    # 如果 result 是布尔值，表示成功与否
+                    return result
+                else:
+                    # 如果 result 不是布尔值，按你需要的逻辑处理，这里假设成功
+                    return True
+
+            else:
+                # 抛出异常，未指定游戏
+                raise Exception("未指定游戏")
+
+        except Exception as e:
+            # 捕获异常，并重新抛出，带上异常信息
+            raise Exception(f"加密过程中发生错误: {str(e)}")
 
     async def get_file_size_async(self, url: str) -> int:
         try:
