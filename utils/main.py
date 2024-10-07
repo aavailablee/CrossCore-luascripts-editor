@@ -1,8 +1,6 @@
 import argparse
-import sys
 
 from utils.LuaScripts import LuaScripts
-from utils.Version import VerMgr
 
 
 class Options:

@@ -3,7 +3,6 @@ import json
 import re
 
 import UnityPy
-from lupa import LuaRuntime
 import pandas as pd
 from config.configManager import ConfigManager
 from config.log import SingletonLogger
@@ -12,7 +11,6 @@ from config.log import SingletonLogger
 class ExtractScript:
     def __init__(self):
         """初始化 Lua 环境并加载配置"""
-        self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.cfg_manager = ConfigManager()
         self.logger = SingletonLogger().get_logger()
 

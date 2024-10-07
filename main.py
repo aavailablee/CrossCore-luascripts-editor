@@ -1,3 +1,4 @@
+import asyncio
 import os.path
 import sys
 import traceback
@@ -13,7 +14,6 @@ from config.log import SingletonLogger
 from utils.DecryptScript import DecryptScript
 from utils.ExtractScript import ExtractScript
 from utils.MergeScript import MergeScript
-import asyncio
 
 
 
