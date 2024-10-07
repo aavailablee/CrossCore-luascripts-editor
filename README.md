@@ -1,6 +1,6 @@
 # CrossCore-luascripts-editor
 
-用了UnityPy和https://github.com/AXiX-official的解加密逻辑
+用了UnityPy和https://github.com/AXiX-official 的解加密逻辑
 
 
 平台就android，ios我没测
