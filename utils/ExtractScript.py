@@ -17,6 +17,10 @@ class ExtractScript:
     def extract_lua_data(self, text_asset):
         """从 TextAsset 中提取 Lua 数据并直接存储配置信息"""
         lua_content = text_asset.m_Script
+        origin_file_path = self.cfg_manager.get('output_folder_extract', './data/3-merge')
+        origin_file_name = os.path.join(origin_file_path, f'{text_asset.m_Name}.txt')
+        with open(origin_file_name, 'w') as f:
+            f.write(lua_content)
 
         # 提取 header 信息（包含 filename, sheetname, types 和 names）
         header_pattern = r'local conf = \{[\s\S]*?\["data"\] = {'
@@ -115,9 +119,11 @@ class ExtractScript:
         for obj in environment.objects:
             if obj.type.name == 'TextAsset':
                 text_asset = obj.read()
+                # if text_asset.m_Name.startswith('cfg') and text_asset.m_Name in ['cfgSound.lua', 'cfgSound1.lua']:
                 if text_asset.m_Name.startswith('cfg') and text_asset.m_Name in ['cfgSound.lua', 'cfgSound1.lua',
-                                                                                 'cfgCfgLanguage.lua',
-                                                                                 'cfgCfgLanguageTips.lua']:
+                                                                                 # 'cfgCfgLanguage.lua',
+                                                                                 # 'cfgCfgLanguageTips.lua'
+                                                                                 ]:
                     print(f"Found Lua file: {text_asset.m_Name}")
 
                     # 提取 Lua 数据并直接存储配置信息
@@ -136,16 +142,17 @@ class ExtractScript:
         for obj in environment.objects:
             if obj.type.name == 'TextAsset':
                 text_asset = obj.read()
-                # if text_asset.m_Name in ["cfgSound1.lua", "cfgSound.lua", 'cfg']:
-                if text_asset.m_Name.startswith('cfg') and text_asset.m_Name in ['cfgSound.lua', 'cfgSound1.lua',
-                                                                                 'cfgCfgLanguage.lua',
-                                                                                 'cfgCfgLanguageTips.lua']:
-                    # print(f"Packing Lua file: {text_asset.m_Name}")
+                # if text_asset.m_Name in ["cfgSound1.lua", "cfgSound.lua"]:
+                if text_asset.m_Name in ['cfgSound.lua', 'cfgSound1.lua',
+                                         # 'cfgCfgLanguage.lua',
+                                         # 'cfgCfgLanguageTips.lua'
+                                         ]:
                     self.logger.info(f"Packing Lua file: {text_asset.m_Name}")
                     # 获取合并后的 CSV 文件路径
                     csv_path = self.cfg_manager.get("output_folder_merge", "./data/3-merge/modified")
                     csv_filename = os.path.join(csv_path, f"{text_asset.m_Name.split('.')[0]}.csv")
                     if not os.path.exists(csv_filename):
+                        self.logger.debug(f"File {text_asset.m_Name.split('.')[0]}.csv does not found in modified folder")
                         csv_path = self.cfg_manager.get("output_folder_extract", "./data/3-merge")
                         csv_filename = os.path.join(csv_path, f"{text_asset.m_Name.split('.')[0]}.csv")
                     print(csv_filename)

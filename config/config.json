@@ -1,7 +1,22 @@
 {
-    "some_key": "new_value1",
-    "file_path": "./data/test",
-    "data_origin_folder": "./data/origin",
+    "input_file_decrypt": "./data/1-resource/luascripts",
+    "output_file_decrypt": "./data/2-origin/luascripts-decrypted",
+    "input_file_encrypt": "./data/4-pack/luascripts-packed",
+    "output_file_encrypt": "./data/5-output/luascripts-encrypted",
+    "output_folder_extract": "./data/3-merge",
+    "input_file_extract": "./data/2-origin/luascripts-decrypted",
+    "cfgCfgLanguage.lua": {
+        "header": "local conf = {\n\t[\"filename\"] = 'd-多语言.xlsx',\n\t[\"sheetname\"] = '介面文字',\n\t[\"types\"] = {\n'string','string','string','string','string','string'\n},\n\t[\"names\"] = {\n'id','key','language1','language2','language3','language4'\n},\n\t[\"data\"] = {",
+        "footer": "},\n}\n--cfgCfgLanguage = conf\nreturn conf",
+        "names": [
+            "id",
+            "key",
+            "language1",
+            "language2",
+            "language3",
+            "language4"
+        ]
+    },
     "cfgSound.lua": {
         "header": "local conf = {\n\t[\"filename\"] = 's-声音.xlsx',\n\t[\"sheetname\"] = '音效',\n\t[\"types\"] = {\n'int','string','string','string','int','int','int','int[]','string','int','string','int','string','int','int','int','bool'\n},\n\t[\"names\"] = {\n'id','key','cue_sheet','cue_name','model','group','type','type_child','name','script1_display','script1','script2_display','script2','openLv','faceIndex','playTime','bookDisplay'\n},\n\t[\"data\"] = {",
         "footer": "},\n}\n--cfgSound = conf\nreturn conf",
@@ -48,16 +63,20 @@
             "bookDisplay"
         ]
     },
-    "data_merge_folder": "./data/merge",
-    "input_file_decrypt": "./data/1-resource/luascripts",
-    "output_file_decrypt": "./data/2-origin/luascripts-decrypted",
-    "input_file_encrypt": "./data/4-pack/luascripts-packed",
-    "output_file_encrypt": "./data/5-output/luascripts-encrypted",
-    "input_file_extract": "./data/2-origin/luascripts-decrypted",
-    "output_folder_extract": "./data/3-merge",
-    "output_file_merge": "./data/3-merge",
-    "output_folder_pack": "./data/4-pack",
-    "output_folder_detach_folder": "./data/3-merge/detach",
+    "cfgCfgLanguageTips.lua": {
+        "header": "local conf = {\n\t[\"filename\"] = 'd-多语言.xlsx',\n\t[\"sheetname\"] = '界面提示',\n\t[\"types\"] = {\n'int','string','string','string','string','string'\n},\n\t[\"names\"] = {\n'id','key','language1','language2','language3','language4'\n},\n\t[\"data\"] = {",
+        "footer": "},\n}\n--cfgCfgLanguageTips = conf\nreturn conf",
+        "names": [
+            "id",
+            "key",
+            "language1",
+            "language2",
+            "language3",
+            "language4"
+        ]
+    },
     "input_folder_merge": "./data/3-merge/detach",
-    "output_folder_merge": "./data/3-merge/modified"
+    "output_folder_merge": "./data/3-merge/modified",
+    "output_folder_pack": "./data/4-pack",
+    "output_folder_detach_folder": "./data/3-merge/detach"
 }
