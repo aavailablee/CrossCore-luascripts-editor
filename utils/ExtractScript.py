@@ -93,8 +93,8 @@ class ExtractScript:
         lua_data += '\n'
 
         # 保存到 test.lua 文件
-        with open('test', 'w', encoding='utf-8') as file:
-            file.write(lua_data)
+        # with open('test', 'w', encoding='utf-8') as file:
+        #     file.write(lua_data)
 
         return lua_data
 
